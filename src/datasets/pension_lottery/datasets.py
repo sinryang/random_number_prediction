@@ -19,6 +19,8 @@ url = 'https://raw.githubusercontent.com/sinryang/random_number_prediction/maste
 Dataset = collections.namedtuple('Dataset', ['data', 'target'])
 Datasets = collections.namedtuple('Datasets', ['train', 'validation', 'test'])
 
+feature_columns = [0, 1, 2, 3, 4, 13, 14, 15, 16, 17, 18, 19]
+
 def load_pension_lottery_data_from_file(filename):
     with open(filename) as fin:
         inputs = list(csv.reader(fin))[1:]
@@ -27,7 +29,7 @@ def load_pension_lottery_data_from_file(filename):
         for row in inputs:
             new_row = []
 
-            for i in range(len(row)):
+            for i in feature_columns:
                 new_row += [float(e)/10 for e in row[i]]
 
             data.append(new_row)
@@ -42,7 +44,7 @@ def load_pension_lottery_data_from_url(url):
     for row in inputs:
         new_row = []
 
-        for i in range(len(row)):
+        for i in feature_columns:
             new_row += [float(e)/10 for e in row[i]]
 
         data.append(new_row)
@@ -68,7 +70,7 @@ def load_pension_lottery_fcn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
         random.shuffle(data)
 
     for i in range(len(data)):
-        target.append(np.array(data[i][-n_feature:], dtype=np.float32))
+        target.append(np.array(data[i][-n_feature:][8:], dtype=np.float32))
         data[i] = np.array(data[i][:n_feature*n_data], dtype=np.float32)
 
     data = np.array(data)
