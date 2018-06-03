@@ -89,7 +89,6 @@ def main(_):
 
 
     # Test
-    correct_prediction = tf.equal(tf.argmax(Y, 1), tf.argmax(Y_, 1))
     l = tf.scalar_mul(10, Y_)
     p = tf.round(tf.scalar_mul(10, Y))
     e = tf.reduce_mean(tf.cast(tf.equal(l, p), tf.float32))

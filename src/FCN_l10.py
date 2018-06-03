@@ -10,7 +10,7 @@ import tensorflow as tf
 
 from datasets.pension_lottery import datasets
 
-N_INPUT_DATA = 10
+N_INPUT_DATA = 100
 N_TARGET_NUM = 35
 
 NUM_INPUTS = N_INPUT_DATA * (N_TARGET_NUM + 8)
@@ -26,7 +26,7 @@ N_HL8_UNITS = NUM_INPUTS
 N_HL9_UNITS = NUM_INPUTS
 N_HL10_UNITS = N_TARGET_NUM
 
-epoch = 10
+epoch = 500
 
 def main(_):
     data = datasets.load_pension_lottery_fcn_datasets(n_data=N_INPUT_DATA, shuffle=True, ratio=[0.7, None, 0.3])
@@ -91,9 +91,10 @@ def main(_):
     # Output
     Y = l_10
 
-    # Define loss and optimizer
+
     Y_ = tf.placeholder(tf.float32, [None, N_TARGET_NUM])
 
+    # Define loss and optimizer
     mse = tf.losses.mean_squared_error(labels=Y_, predictions=Y)
     cost = mse
     train_step = tf.train.AdamOptimizer().minimize(cost)
@@ -119,7 +120,6 @@ def main(_):
 
 
     # Test
-    correct_prediction = tf.equal(tf.argmax(Y, 1), tf.argmax(Y_, 1))
     l = tf.scalar_mul(10, Y_)
     p = tf.round(tf.scalar_mul(10, Y))
     e = tf.reduce_mean(tf.cast(tf.equal(l, p), tf.float32))
