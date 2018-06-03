@@ -64,7 +64,7 @@ def load_pension_lottery_fcn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
     data , target = [], []
 
     for i in range(n_data, len(input)):
-        data.append(sum(input[i-n_data:i+1], []))
+        data.append(sum(input[i-n_data:i], []))
 
     if shuffle:
         random.shuffle(data)
@@ -91,7 +91,52 @@ def load_pension_lottery_fcn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
 
     return Datasets(train=train, validation=validation, test=test)
 
+def load_pension_lottery_rnn_datasets(n_data=1, shuffle=False, ratio=[0.9, None, 0.1]):
+    if os.path.exists(INPUT_PATH):
+        print('load data from file...')
+        input = load_pension_lottery_data_from_file(INPUT_PATH)
+    else:
+        print('load data from url...')
+        input = load_pension_lottery_data_from_url(url)
+
+    n_feature = len(input[0])
+    print(input[0])
+
+    data = []
+
+    for i in range(n_data, len(input)):
+        data.append(sum(input[i-n_data:i], []))
+
+    if shuffle:
+        random.shuffle(data)
+
+    _data = np.empty((n_data, len(data), n_feature))
+    _target = np.empty((n_data, len(data), n_feature-8))
+
+    for i in range(len(data)):
+        _target[:-1, i] = np.zeros(n_feature-8)
+        _target[-1, i] = data[i][-n_feature:][8:]
+        print(data[i])
+        print([data[i][j:j+n_feature] for j in xrange(0, len(data[i][:-n_feature]), n_feature)])
+        _data[:,i] = [data[i][j:j+n_feature] for j in xrange(0, len(data[i])-n_feature, n_feature)]
+
+    n_data = len(_data)
+    n_train = int(n_data * ratio[0])
+
+    train = Dataset(data=_data[:n_train], target=_target[:n_train])
+
+    if ratio[1]:
+        n_test = int(n_data * ratio[2])
+        validation = Dataset(data=_data[n_train:n_data-n_test], target=_target[n_train:n_data-n_test])
+        test = Dataset(data=_data[n_data-n_test:], target=_target[n_data-n_test:])
+    else:
+        validation = None
+        test = Dataset(data=_data[n_train:], target=_target[n_train:])
+
+    return Datasets(train=train, validation=validation, test=test)
+
 if __name__ == '__main__':
+    datasets = load_pension_lottery_rnn_datasets(n_data=2, shuffle=True)
     datasets = load_pension_lottery_fcn_datasets(n_data=2, shuffle=True)
 
     print(datasets.test.target[0])
