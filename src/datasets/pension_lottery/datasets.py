@@ -19,7 +19,7 @@ url = 'https://raw.githubusercontent.com/sinryang/random_number_prediction/maste
 Dataset = collections.namedtuple('Dataset', ['data', 'target'])
 Datasets = collections.namedtuple('Datasets', ['train', 'validation', 'test'])
 
-feature_columns = [0, 1, 2, 3, 4, 13, 14, 15, 16, 17, 18, 19]
+feature_columns = [1, 2, 3, 4, 5, 14, 15, 16, 17, 18, 19, 20]
 
 def load_pension_lottery_data_from_file(filename):
     with open(filename) as fin:
@@ -123,20 +123,21 @@ def load_pension_lottery_rnn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
     n_data = len(_data)
     n_train = int(n_data * ratio[0])
 
-    train = Dataset(data=_data[:n_train], target=_target[:n_train])
+    train = Dataset(data=_data[:,:n_train], target=_target[:,:n_train])
 
     if ratio[1]:
         n_test = int(n_data * ratio[2])
-        validation = Dataset(data=_data[n_train:n_data-n_test], target=_target[n_train:n_data-n_test])
-        test = Dataset(data=_data[n_data-n_test:], target=_target[n_data-n_test:])
+        validation = Dataset(data=_data[:,n_train:n_data-n_test], target=_target[:,n_train:n_data-n_test])
+        test = Dataset(data=_data[:,n_data-n_test:], target=_target[:,n_data-n_test:])
     else:
         validation = None
-        test = Dataset(data=_data[n_train:], target=_target[n_train:])
+        test = Dataset(data=_data[:,n_train:], target=_target[:,n_train:])
 
     return Datasets(train=train, validation=validation, test=test)
 
 if __name__ == '__main__':
     datasets = load_pension_lottery_rnn_datasets(n_data=2, shuffle=True)
-    datasets = load_pension_lottery_fcn_datasets(n_data=2, shuffle=True)
+    #datasets = load_pension_lottery_fcn_datasets(n_data=2, shuffle=True)
 
     print(datasets.test.target[0])
+    print(datasets.test.target[1])
