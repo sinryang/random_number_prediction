@@ -100,12 +100,11 @@ def load_pension_lottery_rnn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
         input = load_pension_lottery_data_from_url(url)
 
     n_feature = len(input[0])
-    print(input[0])
 
     data = []
 
     for i in range(n_data, len(input)):
-        data.append(sum(input[i-n_data:i], []))
+        data.append(sum(input[i-n_data:i+1], []))
 
     if shuffle:
         random.shuffle(data)
@@ -116,8 +115,6 @@ def load_pension_lottery_rnn_datasets(n_data=1, shuffle=False, ratio=[0.9, None,
     for i in range(len(data)):
         _target[:-1, i] = np.zeros(n_feature-8)
         _target[-1, i] = data[i][-n_feature:][8:]
-        print(data[i])
-        print([data[i][j:j+n_feature] for j in xrange(0, len(data[i][:-n_feature]), n_feature)])
         _data[:,i] = [data[i][j:j+n_feature] for j in xrange(0, len(data[i])-n_feature, n_feature)]
 
     n_data = len(_data)
@@ -139,5 +136,4 @@ if __name__ == '__main__':
     datasets = load_pension_lottery_rnn_datasets(n_data=2, shuffle=True)
     #datasets = load_pension_lottery_fcn_datasets(n_data=2, shuffle=True)
 
-    print(datasets.test.target[0])
-    print(datasets.test.target[1])
+    print(datasets.test.data[0])
